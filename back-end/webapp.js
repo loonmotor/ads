@@ -3,18 +3,23 @@ const
 	, consul = require('consul')()
 	, portfinder = require('portfinder')
 	, args = require('minimist')(process.argv.slice(2))
-	, serviceType = args.serviceType;
+	, serviceType = args.serviceType
+	, express = require('express')
+	, app = express()
+	, morgan = require('morgan')
+	, path = require('path');
 
-portfinder.getPort((err, port) => {
+portfinder.getPort((err, foundPort) => {
 
 	const
-		serviceId = serviceType + args.port;
+		port = args.port || foundPort
+		, serviceId = serviceType + port;
 
 	consul.agent.service.register({
 		id : serviceId,
 		name : serviceType,
 		address : 'localhost',
-		port : args.port,
+		port : port,
 		tags : [serviceType]
 	}, () => {
 
@@ -29,12 +34,13 @@ portfinder.getPort((err, port) => {
 		process.on('SIGINT', deregisterService);
 		process.on('uncaughtException', deregisterService);
 
+		app.use(morgan('dev'));
+		app.use(express.static(path.join(__dirname, '..', 'public')));
+		
 		http
-			.createServer((req, res) => {
-				res.end(`response from ${serviceId}`);
-			})
-			.listen(args.port, () => {
-				console.log(`Started ${serviceType} on port ${args.port}`);
+			.createServer(app)
+			.listen(port, () => {
+				console.log(`Started ${serviceType} on port ${port}`);
 			});
 
 	});

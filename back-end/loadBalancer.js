@@ -14,9 +14,6 @@ const
 			service : 'api-service',
 			index : 0
 		}
-	}
-	, proxyHandler = service => {
-
 	};
 
 http
