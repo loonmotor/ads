@@ -7,10 +7,37 @@ const
 
 portfinder.getPort((err, port) => {
 
-	http
-		.createServer((req, res) => {
-			res.end('bye from webapp');
-		})
-		.listen(port);
+	const
+		serviceId = serviceType + args.port;
+
+	consul.agent.service.register({
+		id : serviceId,
+		name : serviceType,
+		address : 'localhost',
+		port : args.port,
+		tags : [serviceType]
+	}, () => {
+
+		const
+			deregisterService = err => {
+				consul.agent.service.deregister(serviceId, () => {
+					process.exit(err ? 1 : 0);
+				});
+			};
+
+		process.on('exit', deregisterService);
+		process.on('SIGINT', deregisterService);
+		process.on('uncaughtException', deregisterService);
+
+		http
+			.createServer((req, res) => {
+				res.end(`response from ${serviceId}`);
+			})
+			.listen(args.port, () => {
+				console.log(`Started ${serviceType} on port ${args.port}`);
+			});
+
+	});
+
 
 });
