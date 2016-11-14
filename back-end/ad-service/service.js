@@ -40,7 +40,7 @@ portfinder.getPort((err, foundPort) => {
 
 		app.use(morgan('dev'));
 
-		app.all('/ad/:id?', restfulApi.restful('Ad'));
+		app.all('/ad/:uuid?', restfulApi.restful('Ad'));
 
 		http
 			.createServer(app)
