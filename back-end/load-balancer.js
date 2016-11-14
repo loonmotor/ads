@@ -10,6 +10,10 @@ const
 			service : 'webapp-service',
 			index : 0
 		},
+		'/ad' : {
+			service : 'ad-service',
+			index : 0
+		},
 		'/api' : {
 			service : 'api-service',
 			index : 0
@@ -20,7 +24,6 @@ http
 	.createServer((req, res) => {
 		
 		consul.agent.service.list((err, services) => {
-
 			const
 				firstPathOfUrl = req.url.split('/').slice(0, 2).join('/')
 				, proxyHandler = microServiceRoute => {
@@ -52,4 +55,6 @@ http
 		});
 
 	})
-	.listen(7000);
+	.listen(7000, () => {
+		console.log(`Load balancer started on port 7000`);
+	});

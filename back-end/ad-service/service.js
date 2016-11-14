@@ -7,18 +7,22 @@ const
 	, express = require('express')
 	, app = express()
 	, morgan = require('morgan')
-	, path = require('path');
+	, path = require('path')
+	, restfulApi = require('../helper/restful-api');
+
+require('./restful-setup');
 
 portfinder.getPort((err, foundPort) => {
 
 	const
 		port = args.port || foundPort
-		, serviceId = serviceType + port;
+		, serviceId = serviceType + port
+		, host = args.host || 'localhost';
 
 	consul.agent.service.register({
 		id : serviceId,
 		name : serviceType,
-		address : 'localhost',
+		address : host,
 		port : port,
 		tags : [serviceType]
 	}, () => {
@@ -35,8 +39,9 @@ portfinder.getPort((err, foundPort) => {
 		process.on('uncaughtException', deregisterService);
 
 		app.use(morgan('dev'));
-		app.use(express.static(path.join(__dirname, '..', 'public')));
-		
+
+		app.all('/ad/:id?', restfulApi.restful('Ad'));
+
 		http
 			.createServer(app)
 			.listen(port, () => {
@@ -44,6 +49,5 @@ portfinder.getPort((err, foundPort) => {
 			});
 
 	});
-
 
 });
