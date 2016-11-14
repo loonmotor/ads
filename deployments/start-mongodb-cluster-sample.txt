@@ -1,0 +1,7 @@
+mongod --configsvr --dbpath /data/mongo-metadata --port 27000
+
+mongos --configdb localhost:27000 --port 27018
+
+mongod --replSet rs0 --dbpath /data/rs0-0 --port 27017
+mongod --replSet rs0 --dbpath /data/rs0-1 --port 27010
+mongod --replSet rs0 --dbpath /data/rs0-2 --port 27011
