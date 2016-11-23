@@ -1,10 +1,8 @@
 const
     gulp = require('gulp')
-    , copy = require('gulp-copy')
     , rev = require('gulp-rev')
     , del = require('del')
     , inject = require('gulp-inject')
-    , webpack = require('webpack')
     , shell = require('gulp-shell');
 
 gulp.task('clean-static-content', () => {
